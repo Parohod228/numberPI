@@ -1,173 +1,259 @@
-"use client"
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Перевірка безпеки — π</title>
 
-import type React from "react"
+    <!-- React і ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
 
-import { useState, useRef, useEffect } from "react"
-import { Card } from "@/components/ui/card"
-import { Shield } from "lucide-react"
+    <!-- Babel для JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-// Перші 100 цифр числа π (без крапки, вона буде статичною)
-const PI_DIGITS =
-  "31415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679"
+    <!-- TailwindCSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
 
-export default function PiLearningApp() {
-  const [correctCount, setCorrectCount] = useState(0)
-  const [currentInput, setCurrentInput] = useState("")
-  const [showError, setShowError] = useState(false)
-  const inputRef = useRef<HTMLInputElement | null>(null)
-
-  useEffect(() => {
-    inputRef.current?.focus()
-  }, [correctCount])
-
-  const getExpectedDigit = (index: number) => {
-    return PI_DIGITS[index]
-  }
-
-  const renderCells = () => {
-    const cells = []
-
-    if (correctCount >= 1) {
-      cells.push(
-        <div
-          key={0}
-          className="w-14 md:w-16 h-14 md:h-16 flex items-center justify-center text-2xl md:text-3xl font-bold rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg transition-all duration-300"
-        >
-          {PI_DIGITS[0]}
-        </div>,
-      )
-    } else {
-      // Порожня комірка для першої цифри
-      cells.push(
-        <div key="current-0" className="relative">
-          <input
-            ref={inputRef}
-            type="text"
-            value={currentInput}
-            onChange={handleInputChange}
-            onKeyDown={handleKeyDown}
-            maxLength={1}
-            className={`w-14 md:w-16 h-14 md:h-16 text-2xl md:text-3xl font-bold text-center rounded-2xl border-2 transition-all duration-300 ${
-              showError
-                ? "border-red-400 bg-red-50 text-red-600 shake"
-                : "border-blue-500 bg-white ring-4 ring-blue-100"
-            } outline-none`}
-          />
-        </div>,
-      )
-    }
-
-    cells.push(
-      <div
-        key="dot"
-        className="w-6 h-14 md:h-16 flex items-center justify-center text-2xl md:text-3xl font-bold text-gray-700"
-      >
-        .
-      </div>,
-    )
-
-    for (let i = 1; i < correctCount; i++) {
-      cells.push(
-        <div
-          key={i}
-          className="w-14 md:w-16 h-14 md:h-16 flex items-center justify-center text-2xl md:text-3xl font-bold rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg transition-all duration-300"
-        >
-          {PI_DIGITS[i]}
-        </div>,
-      )
-    }
-
-    if (correctCount >= 1) {
-      cells.push(
-        <div key="current" className="relative">
-          <input
-            ref={inputRef}
-            type="text"
-            value={currentInput}
-            onChange={handleInputChange}
-            onKeyDown={handleKeyDown}
-            maxLength={1}
-            className={`w-14 md:w-16 h-14 md:h-16 text-2xl md:text-3xl font-bold text-center rounded-2xl border-2 transition-all duration-300 ${
-              showError
-                ? "border-red-400 bg-red-50 text-red-600 shake"
-                : "border-blue-500 bg-white ring-4 ring-blue-100"
-            } outline-none`}
-          />
-        </div>,
-      )
-    }
-
-    return cells
-  }
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-
-    if (value && !/^[0-9]$/.test(value)) return
-
-    setCurrentInput(value)
-
-    if (value) {
-      const expectedDigit = getExpectedDigit(correctCount)
-
-      if (value === expectedDigit) {
-        setCorrectCount(correctCount + 1)
-        setCurrentInput("")
-        setShowError(false)
-      } else {
-        setShowError(true)
-
-        setTimeout(() => {
-          setCurrentInput("")
-          setShowError(false)
-        }, 1500)
+    <style>
+      :root {
+        --radius: 0.625rem;
       }
-    }
-  }
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Backspace" && !currentInput && correctCount > 0) {
-      setCorrectCount(correctCount - 1)
-    }
-  }
+      /* Анімація тремтіння */
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        10%,
+        30%,
+        50%,
+        70%,
+        90% {
+          transform: translateX(-4px);
+        }
+        20%,
+        40%,
+        60%,
+        80% {
+          transform: translateX(4px);
+        }
+      }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-4 py-8">
-      <div className="max-w-4xl mx-auto space-y-6">
-        <Card className="p-6 bg-white/80 backdrop-blur-xl border-0 shadow-xl rounded-3xl">
-          <div className="flex items-center justify-center">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold text-gray-900 flex items-center justify-center gap-2">
-                <Shield className="w-7 h-7 text-red-500" />
-                Перевірка безпеки
-              </h2>
-              <p className="text-sm text-gray-600 mt-2">
-                Виявлено підозрілу активність через постійно схожі запити (можливий DDoS з вашого пк)
-              </p>
-            </div>
+      .shake {
+        animation: shake 0.5s ease-in-out;
+      }
+
+      body {
+        background: linear-gradient(to bottom right, #eef4ff, #f3e8ff);
+        font-family: system-ui, -apple-system, sans-serif;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen p-6">
+    <div id="root"></div>
+
+    <script type="text/babel">
+      const { useState, useRef, useEffect } = React;
+
+      const PI_DIGITS =
+        "31415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679";
+
+      function Card({ children, className = "" }) {
+        return (
+          <div
+            className={
+              "rounded-3xl shadow-xl border border-gray-200 backdrop-blur-xl " +
+              className
+            }
+          >
+            {children}
           </div>
-        </Card>
+        );
+      }
 
-        <Card className="p-4 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 backdrop-blur-xl border-0 rounded-2xl">
-          <p className="text-center text-gray-700 font-semibold text-lg">Для продовження введіть цифри числа π</p>
-        </Card>
+      function PiLearningApp() {
+        const [correctCount, setCorrectCount] = useState(0);
+        const [currentInput, setCurrentInput] = useState("");
+        const [showError, setShowError] = useState(false);
+        const inputRef = useRef(null);
 
-        <Card className="p-8 bg-white/80 backdrop-blur-xl border-0 shadow-xl rounded-3xl">
-          <div className="flex flex-wrap gap-3 items-center justify-center">{renderCells()}</div>
+        useEffect(() => {
+          inputRef.current?.focus();
+        }, [correctCount]);
 
-          {showError && (
-            <div className="mt-6 p-4 bg-red-50 border-2 border-red-200 rounded-2xl animate-in slide-in-from-top duration-300">
-              <p className="text-center text-red-600 font-semibold">Число було введено неправильно</p>
+        const getExpectedDigit = (index) => PI_DIGITS[index];
+
+        const handleInputChange = (e) => {
+          const value = e.target.value;
+          if (value && !/^[0-9]$/.test(value)) return;
+          setCurrentInput(value);
+          if (value) {
+            const expected = getExpectedDigit(correctCount);
+            if (value === expected) {
+              setCorrectCount(correctCount + 1);
+              setCurrentInput("");
+              setShowError(false);
+            } else {
+              setShowError(true);
+              setTimeout(() => {
+                setCurrentInput("");
+                setShowError(false);
+              }, 1500);
+            }
+          }
+        };
+
+        const handleKeyDown = (e) => {
+          if (e.key === "Backspace" && !currentInput && correctCount > 0) {
+            setCorrectCount(correctCount - 1);
+          }
+        };
+
+        const renderCells = () => {
+          const cells = [];
+
+          if (correctCount >= 1) {
+            cells.push(
+              <div
+                key="pi0"
+                className="w-14 md:w-16 h-14 md:h-16 flex items-center justify-center text-2xl md:text-3xl font-bold rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg"
+              >
+                {PI_DIGITS[0]}
+              </div>
+            );
+          } else {
+            cells.push(
+              <div key="input0" className="relative">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={currentInput}
+                  onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
+                  maxLength={1}
+                  className={`w-14 md:w-16 h-14 md:h-16 text-2xl md:text-3xl font-bold text-center rounded-2xl border-2 transition-all duration-300 ${
+                    showError
+                      ? "border-red-400 bg-red-50 text-red-600 shake"
+                      : "border-blue-500 bg-white ring-4 ring-blue-100"
+                  } outline-none`}
+                />
+              </div>
+            );
+          }
+
+          cells.push(
+            <div
+              key="dot"
+              className="w-6 h-14 md:h-16 flex items-center justify-center text-2xl md:text-3xl font-bold text-gray-700"
+            >
+              .
             </div>
-          )}
+          );
 
-          {correctCount >= 3 && (
-            <div className="mt-6 p-4 bg-blue-50 border-2 border-blue-200 rounded-2xl animate-in slide-in-from-top duration-300">
-              <p className="text-center text-blue-700 font-semibold">Введіть перші 100 чисел числа π</p>
-            </div>
-          )}
-        </Card>
-      </div>
-    </div>
-  )
-}
+          for (let i = 1; i < correctCount; i++) {
+            cells.push(
+              <div
+                key={i}
+                className="w-14 md:w-16 h-14 md:h-16 flex items-center justify-center text-2xl md:text-3xl font-bold rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg"
+              >
+                {PI_DIGITS[i]}
+              </div>
+            );
+          }
+
+          if (correctCount >= 1) {
+            cells.push(
+              <div key="current" className="relative">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={currentInput}
+                  onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
+                  maxLength={1}
+                  className={`w-14 md:w-16 h-14 md:h-16 text-2xl md:text-3xl font-bold text-center rounded-2xl border-2 transition-all duration-300 ${
+                    showError
+                      ? "border-red-400 bg-red-50 text-red-600 shake"
+                      : "border-blue-500 bg-white ring-4 ring-blue-100"
+                  } outline-none`}
+                />
+              </div>
+            );
+          }
+
+          return cells;
+        };
+
+        return (
+          <div className="max-w-4xl mx-auto space-y-6">
+            <Card className="p-6 bg-white/80">
+              <div className="flex items-center justify-center">
+                <div className="text-center">
+                  <h2 className="text-2xl font-bold text-gray-900 flex items-center justify-center gap-2">
+                    {/* SVG щит */}
+                    <svg
+                      width="24px"
+                      height="24px"
+                      strokeWidth="1.5"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      color="#000000"
+                      className="text-red-500"
+                    >
+                      <path
+                        d="M4 15.5279V2.6C4 2.26863 4.26863 2 4.6 2H19.4C19.7314 2 20 2.26863 20 2.6V15.5279C20 17.043 19.144 18.428 17.7889 19.1056L12.2683 21.8658C12.0994 21.9503 11.9006 21.9503 11.7317 21.8658L6.21115 19.1056C4.85601 18.428 4 17.043 4 15.5279Z"
+                        stroke="#000000"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      ></path>
+                    </svg>
+
+                    Перевірка безпеки
+                  </h2>
+                  <p className="text-sm text-gray-600 mt-2">
+                    Виявлено підозрілу активність через постійно схожі запити
+                    (можливий DDoS з вашого ПК)
+                  </p>
+                </div>
+              </div>
+            </Card>
+
+            <Card className="p-4 bg-gradient-to-r from-blue-500/10 to-indigo-500/10">
+              <p className="text-center text-gray-700 font-semibold text-lg">
+                Для продовження введіть цифри числа π
+              </p>
+            </Card>
+
+            <Card className="p-8 bg-white/80">
+              <div className="flex flex-wrap gap-3 items-center justify-center">
+                {renderCells()}
+              </div>
+
+              {showError && (
+                <div className="mt-6 p-4 bg-red-50 border-2 border-red-200 rounded-2xl animate-in slide-in-from-top duration-300">
+                  <p className="text-center text-red-600 font-semibold">
+                    Число було введено неправильно
+                  </p>
+                </div>
+              )}
+
+              {correctCount >= 3 && (
+                <div className="mt-6 p-4 bg-blue-50 border-2 border-blue-200 rounded-2xl animate-in slide-in-from-top duration-300">
+                  <p className="text-center text-blue-700 font-semibold">
+                    Введіть перші 100 чисел числа π
+                  </p>
+                </div>
+              )}
+            </Card>
+          </div>
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById("root")).render(<PiLearningApp />);
+    </script>
+  </body>
+</html>
