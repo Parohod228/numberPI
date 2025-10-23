@@ -22,23 +22,9 @@
 
       /* Анімація тремтіння */
       @keyframes shake {
-        0%,
-        100% {
-          transform: translateX(0);
-        }
-        10%,
-        30%,
-        50%,
-        70%,
-        90% {
-          transform: translateX(-4px);
-        }
-        20%,
-        40%,
-        60%,
-        80% {
-          transform: translateX(4px);
-        }
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+        20%, 40%, 60%, 80% { transform: translateX(4px); }
       }
 
       .shake {
@@ -81,6 +67,15 @@
 
         useEffect(() => {
           inputRef.current?.focus();
+        }, [correctCount]);
+
+        useEffect(() => {
+          // Якщо всі 100 цифр введено правильно — переадресація
+          if (correctCount === 100) {
+            setTimeout(() => {
+              window.location.href = "https://www.google.com";
+            }, 1000);
+          }
         }, [correctCount]);
 
         const getExpectedDigit = (index) => PI_DIGITS[index];
@@ -163,7 +158,7 @@
             );
           }
 
-          if (correctCount >= 1) {
+          if (correctCount >= 1 && correctCount < 100) {
             cells.push(
               <div key="current" className="relative">
                 <input
@@ -211,12 +206,11 @@
                         strokeLinejoin="round"
                       ></path>
                     </svg>
-
                     Перевірка безпеки
                   </h2>
                   <p className="text-sm text-gray-600 mt-2">
-                    Виявлено підозрілу активність через постійно схожі запити
-                    (можливий DDoS з вашого ПК)
+                    Виявлено підозрілу активність через повторювані запити.
+                    (Можлива DDoS-активність із вашого пристрою)
                   </p>
                 </div>
               </div>
@@ -224,7 +218,7 @@
 
             <Card className="p-4 bg-gradient-to-r from-blue-500/10 to-indigo-500/10">
               <p className="text-center text-gray-700 font-semibold text-lg">
-                Для продовження введіть цифри числа π
+                Щоб продовжити, введіть цифри числа π
               </p>
             </Card>
 
@@ -236,15 +230,23 @@
               {showError && (
                 <div className="mt-6 p-4 bg-red-50 border-2 border-red-200 rounded-2xl animate-in slide-in-from-top duration-300">
                   <p className="text-center text-red-600 font-semibold">
-                    Число було введено неправильно
+                    Введено неправильну цифру
                   </p>
                 </div>
               )}
 
-              {correctCount >= 3 && (
+              {correctCount >= 3 && correctCount < 100 && (
                 <div className="mt-6 p-4 bg-blue-50 border-2 border-blue-200 rounded-2xl animate-in slide-in-from-top duration-300">
                   <p className="text-center text-blue-700 font-semibold">
-                    Введіть перші 100 чисел числа π
+                    Продовжуйте: потрібно ввести 100 цифр числа π
+                  </p>
+                </div>
+              )}
+
+              {correctCount === 100 && (
+                <div className="mt-6 p-4 bg-green-50 border-2 border-green-200 rounded-2xl animate-in slide-in-from-top duration-300">
+                  <p className="text-center text-green-700 font-semibold">
+                    ✅ Усі 100 цифр введено правильно! Виконується перенаправлення...
                   </p>
                 </div>
               )}
